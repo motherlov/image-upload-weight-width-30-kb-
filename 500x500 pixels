@@ -1,0 +1,125 @@
+//n this example, handleImageChange is called when the user selects an image file. 
+//It reads the file using FileReader and creates a new Image object to check the dimensions. 
+//If the size of the file exceeds 30 KB or its dimensions exceed 500x500 pixels, the user is alerted.
+//Otherwise, the file is stored in the component's state (image). 
+//The handleSubmit function is called when the user clicks the "Upload" button and performs the upload logic,
+//which you can implement based on your requirements (e.g., sending the file to a server).
+
+
+ //////////////////////////////////////////////////part 1/////////////////////////////
+import React, { useState } from 'react';
+
+function ImageUpload() {
+  const [imageURL, setImageURL] = useState('');
+  const [image, setImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          if (file.size > 30000) {
+            alert('Image size exceeds 30 KB.');
+            return;
+          }
+          if (img.width > 500 || img.height > 500) {
+            alert('Image dimensions exceed 500x500.');
+            return;
+          }
+          setImage(file);
+          setImageURL(event.target.result);
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!image) {
+      alert('Please select an image.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('image', image);
+
+    try {
+      const response = await fetch('https://your-api-endpoint.com/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      console.log('Image uploaded successfully:', data);
+      alert('Image uploaded successfully.');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      alert('Error uploading image.');
+    }
+  };
+
+  return (
+    <div>
+      <h1>Image Upload</h1>
+      {imageURL && <img src={imageURL} alt="Preview" style={{ maxWidth: '200px', maxHeight: '200px' }} />}
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      <button onClick={handleSubmit}>Upload</button>
+    </div>
+  );
+}
+
+export default ImageUpload;
+
+///////////////////////////////////////////////////////////////////////////////
+ part- 2
+                         or
+////////////////////////////////////////////////////////////////////////////////
+
+
+import React, { useState } from 'react';
+
+function ImageUpload() {
+  const [image, setImage] = useState(null);
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        if (file.size > 30000) {
+          alert('Image size exceeds 30 KB.');
+          return;
+        }
+        if (img.width > 500 || img.height > 500) {
+          alert('Image dimensions exceed 500x500.');
+          return;
+        }
+        setImage(file);
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = () => {
+    if (!image) {
+      alert('Please select an image.');
+      return;
+    }
+    // Perform upload logic here
+    alert('Image uploaded successfully.');
+  };
+
+  return (
+    <div>
+      <h1>Image Upload</h1>
+      <input type="file" accept="image/*" onChange={handleImageChange} />
+      <button onClick={handleSubmit}>Upload</button>
+    </div>
+  );
+}
+
+export default ImageUpload;
